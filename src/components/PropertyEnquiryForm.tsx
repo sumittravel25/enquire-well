@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface FormData {
+  name: string;
+  email: string;
+  mobile: string;
   timeline: string;
   financing: string;
   purpose: string;
@@ -16,6 +19,9 @@ const PropertyEnquiryForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    mobile: '',
     timeline: '',
     financing: '',
     purpose: '',
@@ -25,13 +31,29 @@ const PropertyEnquiryForm = () => {
     site_visit: ''
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Basic mobile validation (at least 10 digits)
+    const mobileRegex = /^\d{10,}$/;
+    if (!mobileRegex.test(formData.mobile.replace(/\D/g, ''))) {
+      toast.error('Please enter a valid mobile number (at least 10 digits).');
+      setIsSubmitting(false);
+      return;
+    }
     
     try {
       const { error } = await supabase
@@ -58,6 +80,9 @@ const PropertyEnquiryForm = () => {
   const handleReset = () => {
     setSubmitted(false);
     setFormData({
+      name: '',
+      email: '',
+      mobile: '',
       timeline: '',
       financing: '',
       purpose: '',
@@ -105,6 +130,53 @@ const PropertyEnquiryForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          {/* Contact Information Section */}
+          <div className="space-y-6 pb-6 border-b border-border">
+            <h2 className="text-lg font-bold text-foreground">Contact Information</h2>
+            
+            {/* Name */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground uppercase tracking-wider">Full Name</label>
+              <input 
+                type="text"
+                name="name" 
+                required 
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                className="w-full p-4 bg-secondary border border-border rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+
+            {/* Email */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground uppercase tracking-wider">Email Address</label>
+              <input 
+                type="email"
+                name="email" 
+                required 
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email address"
+                className="w-full p-4 bg-secondary border border-border rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+
+            {/* Mobile */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground uppercase tracking-wider">Mobile Number</label>
+              <input 
+                type="tel"
+                name="mobile" 
+                required 
+                value={formData.mobile}
+                onChange={handleChange}
+                placeholder="Enter your mobile number"
+                className="w-full p-4 bg-secondary border border-border rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
           {/* 1. Timeline */}
           <div className="space-y-3">
             <label className="text-sm font-bold text-foreground uppercase tracking-wider">1. Purchase Timeline</label>

@@ -20,8 +20,11 @@ export type Database = {
           budget: string
           created_at: string
           decision_maker: string
+          email: string
           financing: string
           id: string
+          mobile: string
+          name: string
           purpose: string
           site_visit: string
           timeline: string
@@ -31,8 +34,11 @@ export type Database = {
           budget: string
           created_at?: string
           decision_maker: string
+          email?: string
           financing: string
           id?: string
+          mobile?: string
+          name?: string
           purpose: string
           site_visit: string
           timeline: string
@@ -42,8 +48,11 @@ export type Database = {
           budget?: string
           created_at?: string
           decision_maker?: string
+          email?: string
           financing?: string
           id?: string
+          mobile?: string
+          name?: string
           purpose?: string
           site_visit?: string
           timeline?: string
