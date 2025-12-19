@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 interface FormData {
   name: string;
   email: string;
-  mobile: string;
+  phone: string;
   timeline: string;
   financing: string;
   purpose: string;
@@ -22,7 +22,7 @@ const PropertyEnquiryForm = () => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
-    mobile: '',
+    phone: '',
     timeline: '',
     financing: '',
     purpose: '',
@@ -79,9 +79,9 @@ const PropertyEnquiryForm = () => {
       return;
     }
 
-    // Basic mobile validation (at least 10 digits)
-    const mobileRegex = /^\d{10,}$/;
-    if (!mobileRegex.test(formData.mobile.replace(/\D/g, ''))) {
+    // Basic phone validation (at least 10 digits)
+    const phoneRegex = /^\d{10,}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\D/g, ''))) {
       toast.error('Please enter a valid phone number (at least 10 digits).');
       setIsSubmitting(false);
       return;
@@ -128,7 +128,7 @@ const PropertyEnquiryForm = () => {
     setFormData({
       name: '',
       email: '',
-      mobile: '',
+      phone: '',
       timeline: '',
       financing: '',
       purpose: '',
@@ -241,14 +241,14 @@ const PropertyEnquiryForm = () => {
               />
             </div>
 
-            {/* Mobile */}
+            {/* Phone */}
             <div className="space-y-3">
               <label className="text-sm font-bold text-foreground uppercase tracking-wider">Phone Number</label>
               <input 
                 type="tel"
-                name="mobile" 
+                name="phone" 
                 required 
-                value={formData.mobile}
+                value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter your phone number"
                 className="w-full p-4 bg-secondary border border-border rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-foreground placeholder:text-muted-foreground"

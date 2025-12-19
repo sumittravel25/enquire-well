@@ -23,8 +23,8 @@ export type Database = {
           email: string
           financing: string
           id: string
-          mobile: string
           name: string
+          phone: string
           purpose: string
           site_visit: string
           timeline: string
@@ -37,8 +37,8 @@ export type Database = {
           email?: string
           financing: string
           id?: string
-          mobile?: string
           name?: string
+          phone?: string
           purpose: string
           site_visit: string
           timeline: string
@@ -51,8 +51,8 @@ export type Database = {
           email?: string
           financing?: string
           id?: string
-          mobile?: string
           name?: string
+          phone?: string
           purpose?: string
           site_visit?: string
           timeline?: string
