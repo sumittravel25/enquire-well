@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -18,6 +18,7 @@ interface FormData {
 const PropertyEnquiryForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -30,6 +31,37 @@ const PropertyEnquiryForm = () => {
     budget: '',
     site_visit: ''
   });
+
+  // Check database connection on mount
+  useEffect(() => {
+    const checkConnection = async () => {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        const errorMsg = 'Database configuration missing. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY are set in your environment.';
+        console.error('Configuration Error:', errorMsg);
+        console.error('VITE_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
+        console.error('VITE_SUPABASE_PUBLISHABLE_KEY:', supabaseKey ? 'Set' : 'Missing');
+        setConnectionError(errorMsg);
+        return;
+      }
+
+      try {
+        // Test connection with a simple query
+        const { error } = await supabase.from('property_enquiries').select('id').limit(1);
+        if (error) {
+          console.error('Database connection test failed:', error);
+          setConnectionError(`Database connection failed: ${error.message}`);
+        }
+      } catch (err) {
+        console.error('Connection check error:', err);
+        setConnectionError('Unable to connect to the database. Please check your configuration.');
+      }
+    };
+
+    checkConnection();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,23 +88,37 @@ const PropertyEnquiryForm = () => {
     }
     
     try {
-      const { error } = await supabase
+      console.log('Submitting enquiry...', { timestamp: new Date().toISOString() });
+      
+      const { data, error } = await supabase
         .from('property_enquiries')
-        .insert([formData]);
+        .insert([formData])
+        .select();
 
       if (error) {
-        console.error('Error submitting enquiry:', error);
-        toast.error('Failed to submit enquiry. Please try again.');
+        console.error('Supabase error details:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        toast.error(`Submission failed: ${error.message}`);
         setIsSubmitting(false);
         return;
       }
 
+      console.log('Enquiry submitted successfully:', data);
       setIsSubmitting(false);
       setSubmitted(true);
       toast.success('Enquiry submitted successfully!');
     } catch (err) {
-      console.error('Unexpected error:', err);
-      toast.error('An unexpected error occurred. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      console.error('Unexpected error during submission:', {
+        error: err,
+        message: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+      toast.error(`An unexpected error occurred: ${errorMessage}`);
       setIsSubmitting(false);
     }
   };
@@ -92,6 +138,39 @@ const PropertyEnquiryForm = () => {
       site_visit: ''
     });
   };
+
+  // Show connection error UI
+  if (connectionError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-card p-10 rounded-4xl shadow-elegant max-w-md w-full text-center space-y-6 border border-destructive/50 animate-scale-in">
+          <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold text-foreground">Configuration Error</h2>
+            <p className="text-muted-foreground leading-relaxed text-sm">{connectionError}</p>
+          </div>
+          <div className="text-left bg-secondary/50 p-4 rounded-xl text-xs text-muted-foreground space-y-2">
+            <p className="font-semibold">To fix this issue:</p>
+            <ol className="list-decimal list-inside space-y-1">
+              <li>Ensure environment variables are set during build</li>
+              <li>Check your hosting provider's environment settings</li>
+              <li>Rebuild and redeploy your application</li>
+            </ol>
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full py-3 px-6 bg-secondary text-secondary-foreground font-semibold rounded-2xl hover:bg-secondary/80 transition-colors"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
