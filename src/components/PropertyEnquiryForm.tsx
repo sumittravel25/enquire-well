@@ -82,7 +82,7 @@ const PropertyEnquiryForm = () => {
     // Basic mobile validation (at least 10 digits)
     const mobileRegex = /^\d{10,}$/;
     if (!mobileRegex.test(formData.mobile.replace(/\D/g, ''))) {
-      toast.error('Please enter a valid mobile number (at least 10 digits).');
+      toast.error('Please enter a valid phone number (at least 10 digits).');
       setIsSubmitting(false);
       return;
     }
@@ -243,14 +243,14 @@ const PropertyEnquiryForm = () => {
 
             {/* Mobile */}
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground uppercase tracking-wider">Mobile Number</label>
+              <label className="text-sm font-bold text-foreground uppercase tracking-wider">Phone Number</label>
               <input 
                 type="tel"
                 name="mobile" 
                 required 
                 value={formData.mobile}
                 onChange={handleChange}
-                placeholder="Enter your mobile number"
+                placeholder="Enter your phone number"
                 className="w-full p-4 bg-secondary border border-border rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-foreground placeholder:text-muted-foreground"
               />
             </div>
