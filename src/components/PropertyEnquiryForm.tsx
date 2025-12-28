@@ -108,6 +108,26 @@ const PropertyEnquiryForm = () => {
       }
 
       console.log('Enquiry submitted successfully:', data);
+      
+      // Trigger n8n webhook
+      try {
+        await fetch('https://sumeettz.app.n8n.cloud/webhook-test/real-estate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          mode: 'no-cors',
+          body: JSON.stringify({
+            ...formData,
+            submitted_at: new Date().toISOString(),
+          }),
+        });
+        console.log('n8n webhook triggered successfully');
+      } catch (webhookError) {
+        console.error('Failed to trigger n8n webhook:', webhookError);
+        // Don't fail the submission if webhook fails
+      }
+      
       setIsSubmitting(false);
       setSubmitted(true);
       toast.success('Enquiry submitted successfully!');
