@@ -29,7 +29,7 @@ serve(async (req) => {
 
     console.log('Sending to n8n webhook:', webhookPayload);
 
-    const response = await fetch('https://sumeettz.app.n8n.cloud/webhook-test/real-estate', {
+    const response = await fetch('https://sumeettz.app.n8n.cloud/webhook/real-estate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
